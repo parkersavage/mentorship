@@ -8,8 +8,8 @@ contract TrustFund{
 
     constructor() public{
         grantor = msg.sender;
-        trustee = 0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2;
-        unlockDate = 1644334800;
+        trustee = ###;
+        unlockDate = ###; /// In Unix Seconds
     }
 
     function viewBalance() public view returns (uint256){
