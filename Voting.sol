@@ -5,6 +5,7 @@ contract Voting{
    address admin;
    string public title;
    string public description;
+   uint256 public endDate;
    string[] public options;
    uint256[] public tally;
 
@@ -19,12 +20,13 @@ contract Voting{
 
     mapping(address => Voter) public voters;
 
-    function createNewElection(string memory _title, string memory _description, string[] memory _options, uint256[] memory _tally) public{
+    function createNewElection(string memory _title, string memory _description, string[] memory _options, uint256[] memory _tally, uint256 memory _endDate) external{
         require(msg.sender==admin);
         title = _title;
         description = _description;
         options = _options;
         tally = _tally;
+        endDate = _endDate;
     }
 
     function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
@@ -40,7 +42,7 @@ contract Voting{
         return true;
     }
 
-    function vote(string memory _vote) public{
+    function vote(string memory _vote) external{
         // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
         Voter storage sender = voters[msg.sender];
         require(!sender.voted);
@@ -52,5 +54,12 @@ contract Voting{
             }
             i = i + 1;
         }
+        sender.vote = _vote;
+    }
+
+    function getWinner(){
+        require(block.timestamp>=endDate);
+        string winner;
+        if ()
     }
 }
