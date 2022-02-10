@@ -28,5 +28,14 @@ contract Voting{
 
     function vote(string _vote){
         Voter storage sender = voters[msg.sender]; // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
+        require(!sender.voted);
+        sender.voted = true;
+        i = 0;
+        while (i < options.length){
+            if (_vote == options[i]){
+                tally[i] = tally[i] + 1;
+            }
+            i = i + 1;
+        }
     }
 }
