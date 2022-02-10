@@ -40,7 +40,8 @@ contract Voting{
     }
 
     function vote(string memory _vote) public{
-        Voter storage sender = voters[msg.sender]; // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
+        // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
+        Voter storage sender = voters[msg.sender];
         require(!sender.voted);
         sender.voted = true;
         uint256 i = 0;
