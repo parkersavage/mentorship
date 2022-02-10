@@ -28,7 +28,7 @@ contract Voting{
     }
 
     function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
-        // only way that i could came string in array with string in parameter
+        // only way that i could compare string in array with string in parameter
         bytes memory b1 = bytes(s1);
         bytes memory b2 = bytes(s2);
         uint256 l1 = b1.length;
