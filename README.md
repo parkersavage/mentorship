@@ -1,1 +1,1 @@
-# mentorship
+# OSSM Cryptocurrency Mentorship
