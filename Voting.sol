@@ -20,7 +20,7 @@ contract Voting{
 
     mapping(address => Voter) public voters;
 
-    function createNewElection(string memory _title, string memory _description, string[] memory _options, uint256[] memory _tally, uint256 memory _endDate) external{
+    function createNewElection(string memory _title, string memory _description, string[] memory _options, uint256[] memory _tally, uint256 _endDate) external{
         require(msg.sender==admin);
         title = _title;
         description = _description;
@@ -42,12 +42,23 @@ contract Voting{
         return true;
     }
 
+    function arrayContains(string[] memory _array, string memory _input) internal pure returns (bool){
+        uint256 i = 0;
+        while (i < _array.length){
+            if(stringsEquals(_array[i],_input)) return true;
+        }
+        return false;
+    }
+
     function vote(string memory _vote) external{
         // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
         Voter storage sender = voters[msg.sender];
         require(!sender.voted);
+        require(block.timestamp<endDate);
+        require(arrayContains(options, _vote));
         sender.voted = true;
         uint256 i = 0;
+        // to-do: error if someone votes for someone that isn't an option
         while (i < options.length){
             if (stringsEquals(_vote, options[i])){
                 tally[i] = tally[i] + 1;
@@ -57,9 +68,15 @@ contract Voting{
         sender.vote = _vote;
     }
 
-    function getWinner(){
+    function getWinner() public view returns (string memory){
         require(block.timestamp>=endDate);
-        string winner;
-        if ()
+        uint256 i = 0;
+        uint256 largest = 0;
+        for(i = 0; i < tally.length; i++){
+            if(tally[i] > largest) {
+                largest = i; 
+            } 
+        }
+        return options[largest];
     }
 }
