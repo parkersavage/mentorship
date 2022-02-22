@@ -9,7 +9,9 @@ contract Voting{
    string public description;
    uint256 public endDate;
    string[] public options;
+   string[] winners;
    uint256[] public tally;
+
 
    constructor(){
         admin = msg.sender;
@@ -22,17 +24,18 @@ contract Voting{
 
     mapping(address => Voter) public voters;
 
-    function createNewElection(string memory _title, string memory _description, string[] memory _options, uint256[] memory _tally, uint256 _endDate) external{
+    function createNewElection(string memory _title, string memory _description, string[] memory _options, uint256 _endDate) external{
         require(msg.sender==admin);
         title = _title;
         description = _description;
         options = _options;
-        tally = _tally;
         endDate = _endDate;
+        for(uint256 i = 0; i < options.length; i++){
+            tally.push(0);
+        }
     }
 
     function stringsEquals(string memory s1, string memory s2) private pure returns (bool) {
-        // only way that i could compare string in array with string in parameter
         // https://ethereum.stackexchange.com/questions/4559/operator-not-compatible-with-type-string-storage-ref-and-literal-string
         bytes memory b1 = bytes(s1);
         bytes memory b2 = bytes(s2);
@@ -44,43 +47,43 @@ contract Voting{
         return true;
     }
 
-    function arrayContains(string[] memory _array, string memory _input) internal pure returns (bool){
-        bool doesListContainElement = false;
-        for (uint i=0; i < _array.length; i++) {
-            if (stringsEquals(_input, _array[i])) {
-                doesListContainElement = true;
-            }
-        }
-        return doesListContainElement;
-    }
-
     function vote(string memory _vote) external{
         // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
-        Voter storage sender = voters[msg.sender];     
+        Voter storage sender = voters[msg.sender];    
         require(!sender.voted);
         require(block.timestamp<endDate);
-        require(arrayContains(options, _vote));
         sender.voted = true;
+        bool successfully_voted = false;
         uint256 i = 0;
         while (i < options.length){
             if (stringsEquals(_vote, options[i])){
                 tally[i] = tally[i] + 1;
+                successfully_voted = true;
+                break;
             }
             i = i + 1;
         }
-        sender.vote = _vote;
+        if (successfully_voted == true){
+            sender.vote = _vote;
+        }           
+        else {
+            revert();
+        }
     }
 
-    function getWinner() public view returns (string memory){
-        require(block.timestamp>=endDate);
-        uint256 i = 0;
-        uint256 largest = 0;
-        for(i = 0; i < tally.length; i++){
-            if(tally[i] > largest) {
-                largest = i; 
-                console.log(i);
+    function getWinner() public returns (string[] memory){
+        // require(block.timestamp>=endDate);
+        uint256 max_votes = 0;
+        for(uint256 i = 0; i < tally.length; i++){
+            if(tally[i] > max_votes) {
+                max_votes = tally[i];
             } 
         }
-        return options[largest];
+        for(uint256 j = 0; j < tally.length; j++){
+            if(max_votes == tally[j]){
+                winners.push(options[j]);
+            }
+        }
+        return winners;
     }
 }
