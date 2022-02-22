@@ -1,6 +1,8 @@
 pragma solidity ^0.7.0;
 pragma abicoder v2;
 
+import "hardhat/console.sol";
+
 contract Voting{
    address admin;
    string public title;
@@ -43,22 +45,23 @@ contract Voting{
     }
 
     function arrayContains(string[] memory _array, string memory _input) internal pure returns (bool){
-        uint256 i = 0;
-        while (i < _array.length){
-            if(stringsEquals(_array[i],_input)) return true;
+        bool doesListContainElement = false;
+        for (uint i=0; i < _array.length; i++) {
+            if (stringsEquals(_input, _array[i])) {
+                doesListContainElement = true;
+            }
         }
-        return false;
+        return doesListContainElement;
     }
 
     function vote(string memory _vote) external{
         // https://docs.soliditylang.org/en/v0.8.11/solidity-by-example.html
-        Voter storage sender = voters[msg.sender];
+        Voter storage sender = voters[msg.sender];     
         require(!sender.voted);
         require(block.timestamp<endDate);
         require(arrayContains(options, _vote));
         sender.voted = true;
         uint256 i = 0;
-        // to-do: error if someone votes for someone that isn't an option
         while (i < options.length){
             if (stringsEquals(_vote, options[i])){
                 tally[i] = tally[i] + 1;
@@ -75,6 +78,7 @@ contract Voting{
         for(i = 0; i < tally.length; i++){
             if(tally[i] > largest) {
                 largest = i; 
+                console.log(i);
             } 
         }
         return options[largest];
